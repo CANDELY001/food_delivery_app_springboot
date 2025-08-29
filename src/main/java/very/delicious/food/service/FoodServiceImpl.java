@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import very.delicious.food.entities.FoodEntity;
@@ -73,7 +74,22 @@ public class FoodServiceImpl implements FoodService {
 
     @Override
     public boolean deleteFile(String filename) {
-        return false;
+        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                .bucket(bucketName).key(filename).build();
+        s3Client.deleteObject(deleteObjectRequest);
+        return true;
+    }
+
+    @Override
+    public void deleteFood(String id) {
+        FoodResponse foodResponse = readFood(id);
+        String imageUrl = foodResponse.getImageUrl();
+        String filename = imageUrl.substring(imageUrl.lastIndexOf("/")+1);
+        boolean isFileDeleted = deleteFile(filename);
+        if(isFileDeleted){
+            foodRepository.deleteById(foodResponse.getId());
+        }
+
     }
 
     private FoodEntity convertToEntity(FoodRequest foodRequest){

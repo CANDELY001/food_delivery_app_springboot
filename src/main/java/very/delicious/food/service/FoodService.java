@@ -18,6 +18,9 @@ public interface FoodService {
    //Read food by ID
     FoodResponse readFood(String id);
 
-    //Delete Food by ID
+    //Delete Food image from s3 bucket
     boolean deleteFile(String filename);
+
+    //delete food by id
+    void deleteFood(String id);
 }

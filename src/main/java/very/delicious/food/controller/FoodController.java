@@ -56,5 +56,11 @@ public class FoodController {
     return  foodService.readFood(id);
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFood(@PathVariable String id) {
+
+        foodService.deleteFood(id);
+    }
 
 }
