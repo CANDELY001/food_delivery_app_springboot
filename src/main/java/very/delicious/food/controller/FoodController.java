@@ -2,6 +2,7 @@ package very.delicious.food.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/foods")
+@CrossOrigin("*")
 public class FoodController {
     private final FoodService foodService;
     private final ObjectMapper objectMapper;
