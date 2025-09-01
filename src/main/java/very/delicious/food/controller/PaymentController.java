@@ -22,11 +22,16 @@ public class PaymentController {
     public String createCheckoutSession(@PathVariable String orderId) throws Exception {
         OrderEntity order = orderRepository.findById(orderId).orElseThrow();
         Session session = paymentService.createCheckoutSession(order);
+
+        // Save session ID in order for webhook tracking
+        order.setStripeCheckoutSessionId(session.getId());
         orderRepository.save(order);
-        return session.getUrl(); // frontend redirects to this
+
+        // Return session URL for frontend redirect
+        return session.getUrl();
     }
 
-    @GetMapping("/success")
+    @GetMapping("/payment/success*")
     public String paymentSuccess(@RequestParam("session_id") String sessionId) throws Exception {
         OrderEntity order = orderRepository.findByStripeCheckoutSessionId(sessionId).orElseThrow();
         order.setPaymentStatus("PAID");
@@ -34,7 +39,7 @@ public class PaymentController {
         return "Payment successful!";
     }
 
-    @GetMapping("/cancel")
+    @GetMapping("/payment/cancel")
     public String paymentCancelled() {
         return "Payment cancelled!";
     }

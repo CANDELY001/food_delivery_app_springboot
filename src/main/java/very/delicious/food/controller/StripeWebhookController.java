@@ -27,31 +27,24 @@ public class StripeWebhookController {
     @PostMapping
     public String handleStripeEvent(HttpServletRequest request,
                                     @RequestHeader("Stripe-Signature") String sigHeader) throws Exception {
-
         StringBuilder payload = new StringBuilder();
         try (BufferedReader reader = request.getReader()) {
             String line;
-            while ((line = reader.readLine()) != null) {
-                payload.append(line);
-            }
+            while ((line = reader.readLine()) != null) payload.append(line);
         }
 
         Event event = Webhook.constructEvent(payload.toString(), sigHeader, endpointSecret);
 
-        switch (event.getType()) {
-            case "checkout.session.completed":
-                Session session = (Session) event.getDataObjectDeserializer()
-                        .getObject().orElseThrow();
-                OrderEntity order = orderRepository.findByStripeCheckoutSessionId(session.getId())
-                        .orElseThrow();
-                order.setPaymentStatus("PAID");
-                orderRepository.save(order);
-                break;
-            case "payment_intent.payment_failed":
-                // optional: mark order as failed
-                break;
+        if ("checkout.session.completed".equals(event.getType())) {
+            Session session = (Session) event.getDataObjectDeserializer()
+                    .getObject().orElseThrow();
+            OrderEntity order = orderRepository.findByStripeCheckoutSessionId(session.getId())
+                    .orElseThrow();
+            order.setPaymentStatus("PAID");
+            orderRepository.save(order);
         }
 
         return "";
     }
+
 }

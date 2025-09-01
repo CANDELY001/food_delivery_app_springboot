@@ -28,14 +28,20 @@ public class OrderController {
     @PostMapping("/create")
     public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody OrderRequest orderRequest) {
         OrderResponse response = orderService.createOrderWithPayment(orderRequest);
-        return ResponseEntity.ok(response);
+
+        if (response.getStripeCheckoutSessionId() == null) {
+            // Stripe session failed
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(response);
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     /**
      * Get all orders for the logged-in user
      */
     @GetMapping
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<List<OrderResponse>> getUserOrders() {
         List<OrderResponse> orders = orderService.getOrdersForUser(); // implement in service
         return ResponseEntity.ok(orders);

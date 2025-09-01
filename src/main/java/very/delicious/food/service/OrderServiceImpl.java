@@ -94,11 +94,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponse updateOrderStatus(String orderId, String newStatus) {
-        String userId = userService.findByUserId();
-
         OrderEntity order = orderRepository.findById(orderId)
-                .filter(o -> o.getUserId().equals(userId))
-                .orElseThrow(() -> new RuntimeException("Order not found or not authorized"));
+                .orElseThrow(() -> new RuntimeException("Order not found"));
 
         order.setOrdersStatus(newStatus);
         orderRepository.save(order);
@@ -125,6 +122,8 @@ public class OrderServiceImpl implements OrderService {
                 .userId(order.getUserId())
                 .amount(order.getAmount())
                 .email(order.getEmail())
+                .stripeCheckoutSessionId(order.getStripeCheckoutSessionId())
+                .orderedItems(order.getOrderedItems())
                 .paymentStatus(order.getPaymentStatus())
                 .ordersStatus(order.getOrdersStatus())
                 .build();

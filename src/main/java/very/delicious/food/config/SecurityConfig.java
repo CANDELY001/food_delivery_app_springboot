@@ -35,8 +35,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth ->auth.requestMatchers("/api/register","/api/login","/api/foods","/api/foods/{id}").permitAll()
-                        .requestMatchers("/api/orders/**", "/api/orders")
+                .authorizeHttpRequests(auth ->auth.requestMatchers("/api/register","/api/login","/api/foods","/api/foods/{id}","/api/orders/*","/api/orders/status/{orderId}*").permitAll()
+                        .requestMatchers( "/api/orders","/api/cart/*")
                         .authenticated() .anyRequest().authenticated())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
